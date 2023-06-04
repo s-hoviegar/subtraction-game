@@ -1,0 +1,13 @@
+.board {
+  text-align: center;
+  display: inline-block;
+
+  margin: 0;
+  width: 600px;
+}
+
+@media only screen and (max-width: 600px) {
+  .board {
+    width: 75%;
+  }
+}

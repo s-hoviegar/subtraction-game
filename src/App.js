@@ -1,12 +1,8 @@
 import "./App.css";
-import Orb from "./components/Orb";
+import Game from "./components/Game/Game";
 
 function App() {
-  const balls = [];
-  for (var i = 0; i < 10; i++) {
-    balls.push(i);
-  }
-  return balls.map(() => <Orb />);
+  return <Game numberOfBalls={25} />;
 }
 
 export default App;
