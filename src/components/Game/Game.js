@@ -1,12 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import { Button } from "react-bootstrap";
+
 import Orb from "../Orb/Orb";
 import "./Game.css";
 
-const Game = (props) => {
-  const numberOfOrbs = props.numberOfBalls;
-  const orbsMoveNumber = props.ballsMoveNumber;
+const Game = () => {
+  const { state } = useLocation();
+  let numberOfOrbs = 0;
+  let orbsMoveNumber = 0;
+  let firstTurn = "";
+
+  if (!state) {
+    numberOfOrbs = 15;
+    orbsMoveNumber = 3;
+    firstTurn = "c";
+  } else {
+    numberOfOrbs = parseInt(state.numberOfOrbs);
+    orbsMoveNumber = parseInt(state.orbsMoveNumber);
+    firstTurn = state.turn;
+  }
 
   const [orbs, setOrbs] = useState([]);
+  const [turn, setTurn] = useState(firstTurn);
+  const [playerOrbsTaken, setPlayerOrbsTaken] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const balls = [];
@@ -16,6 +36,102 @@ const Game = (props) => {
     setOrbs(balls);
   }, [numberOfOrbs]);
 
+  useEffect(() => {
+    if (!state) {
+      navigate("/", { replace: true });
+    }
+  });
+
+  useEffect(() => {
+    if (playerOrbsTaken === orbsMoveNumber) {
+      setPlayerOrbsTaken(0);
+      setTurn("c");
+    }
+  }, [playerOrbsTaken, orbsMoveNumber]);
+
+  const countActiveOrbs = useCallback(() => {
+    let count = 0;
+    orbs.map((orb) => (orb.display ? count++ : null));
+    return count;
+  }, [orbs]);
+
+  const returnAllOrbs = useCallback(() => {
+    const activeOrbs = [];
+    orbs.map((orb) => {
+      if (orb.display) return activeOrbs.push(orb);
+      else return activeOrbs.push(orb);
+    });
+    return activeOrbs;
+  }, [orbs]);
+
+  const computerPlay = useCallback(() => {
+    const remainingBalls = parseInt(countActiveOrbs());
+    const currentBalls = returnAllOrbs();
+
+    if (remainingBalls > 1) {
+      let rem = parseInt(remainingBalls % (orbsMoveNumber + 1));
+      // console.log(rem, remainingBalls, orbsMoveNumber);
+      if (rem === 0) {
+        const randArr = randomNumberGenerator(orbsMoveNumber, currentBalls);
+        for (let i = 0; i < orbsMoveNumber; i++) {
+          currentBalls[randArr[i]].display = false;
+        }
+        // setTimeout(function () {
+        //   chooseBalls(orbsMoveNumber);
+        // }, 1500);
+        setOrbs(currentBalls);
+      }
+      if (rem === 1) {
+        const randMove = Math.floor(Math.random() * orbsMoveNumber) + 1;
+        const randArr = randomNumberGenerator(randMove, currentBalls);
+        for (let i = 0; i < randMove; i++) {
+          currentBalls[randArr[i]].display = false;
+        }
+        // setTimeout(function () {
+        //   chooseBalls(randMove);
+        // }, 1500);
+        setOrbs(currentBalls);
+      }
+      if (rem > 1) {
+        const randArr = randomNumberGenerator(rem - 1, currentBalls);
+
+        for (let i = 0; i < rem - 1; i++) {
+          currentBalls[randArr[i]].display = false;
+        }
+        // setTimeout(function () {
+        //   chooseBalls(rem - 1);
+        // }, 1500);
+        setOrbs(currentBalls);
+      }
+    } else if (remainingBalls === 1) {
+      // setTimeout(function () {
+      //   chooseBalls(1);
+      // }, 1500);
+      for (let i = 0; i < currentBalls.length; i++) {
+        if ((currentBalls[i].display = true)) currentBalls[i].display = false;
+      }
+
+      setOrbs(currentBalls);
+    }
+    //alert(currentBalls[0].mouseout);
+  }, [countActiveOrbs, orbsMoveNumber, returnAllOrbs]);
+
+  useEffect(() => {
+    if (turn === "c" && orbs.length > 0) {
+      computerPlay();
+      setTurn("p");
+    } else if (turn === "p" && countActiveOrbs() === 1) {
+      alert("You lost!");
+      navigate("/", { replace: true });
+    } else if (turn === "c" && countActiveOrbs() === 1) {
+      alert("You Won!");
+      navigate("/", { replace: true });
+    }
+  }, [turn, computerPlay, countActiveOrbs, navigate, orbs]);
+
+  if (!state) {
+    return null;
+  }
   const randomNumberGenerator = (numberOfRandoms, balls) => {
     let numArray = [];
 
@@ -39,91 +155,48 @@ const Game = (props) => {
     const results = numArray.filter((element) => {
       return element !== undefined;
     });
+
     return results.slice(0, numberOfRandoms);
-  };
-
-  const countActiveOrbs = () => {
-    let count = 0;
-    orbs.map((orb) => {
-      if (orb.display) count++;
-    });
-    return count;
-  };
-
-  const returnAllOrbs = () => {
-    const activeOrbs = [];
-    orbs.map((orb) => {
-      if (orb.display) activeOrbs.push(orb);
-      else activeOrbs.push(orb);
-    });
-    return activeOrbs;
   };
 
   const turnOffOrb = (event) => {
     // console.log(event.target.id);
-    setOrbs((pervOrbs) => {
-      const newOrbs = JSON.parse(JSON.stringify(pervOrbs));
-      // console.log(event.target.id);
-      for (let i = 0; i < newOrbs.length; i++) {
-        // console.log(newOrbs[i].id, event.target.id);
-        if (newOrbs[i].id == event.target.id) {
-          newOrbs[i].display = !newOrbs[i].display;
+    if (turn === "p" && playerOrbsTaken < orbsMoveNumber) {
+      setPlayerOrbsTaken((perValue) => perValue + 1);
+      setOrbs((pervOrbs) => {
+        const newOrbs = JSON.parse(JSON.stringify(pervOrbs));
+        // console.log(event.target.id);
+        for (let i = 0; i < newOrbs.length; i++) {
+          // console.log(newOrbs[i].id, event.target.id);
+          if (newOrbs[i].id === parseInt(event.target.id)) {
+            newOrbs[i].display = !newOrbs[i].display;
+          }
         }
-      }
 
-      return newOrbs;
-    });
+        return newOrbs;
+      });
+    }
   };
 
-  const computerPlay = () => {
-    const remainingBalls = countActiveOrbs();
-    const currentBalls = returnAllOrbs();
-
-    if (remainingBalls > 1) {
-      let rem = remainingBalls % (orbsMoveNumber + 1);
-      // console.log(remainingBalls, rem);
-      if (rem == 0) {
-        const randArr = randomNumberGenerator(orbsMoveNumber, currentBalls);
-        for (let i = 0; i < orbsMoveNumber; i++) {
-          currentBalls[randArr[i]].display = false;
-        }
-        // setTimeout(function () {
-        //   chooseBalls(orbsMoveNumber);
-        // }, 1500);
-        setOrbs(currentBalls);
-      }
-      if (rem == 1) {
-        const randMove = Math.floor(Math.random() * orbsMoveNumber) + 1;
-        const randArr = randomNumberGenerator(randMove, currentBalls);
-        for (let i = 0; i < randMove; i++) {
-          currentBalls[randArr[i]].display = false;
-        }
-        // setTimeout(function () {
-        //   chooseBalls(randMove);
-        // }, 1500);
-        setOrbs(currentBalls);
-      }
-      if (rem > 1) {
-        const randArr = randomNumberGenerator(rem - 1, currentBalls);
-        for (let i = 0; i < rem - 1; i++) {
-          currentBalls[randArr[i]].display = false;
-        }
-        // setTimeout(function () {
-        //   chooseBalls(rem - 1);
-        // }, 1500);
-        setOrbs(currentBalls);
-      }
-    } else if (remainingBalls == 1) {
-      // setTimeout(function () {
-      //   chooseBalls(1);
-      // }, 1500);
-      for (let i = 0; i < currentBalls.length; i++) {
-        if ((currentBalls[i].display = true)) currentBalls[i].display = false;
-      }
-
-      setOrbs(currentBalls);
+  const runGame = () => {
+    if (turn === "c" && countActiveOrbs() === 1) {
+      alert("You lost!");
+      navigate("/", { replace: true });
+    } else if (turn === "p" && countActiveOrbs() === 1) {
+      alert("You Won!");
+      navigate("/", { replace: true });
     }
-    //alert(currentBalls[0].mouseout);
+    if (turn === "c") {
+      computerPlay();
+      setTurn("p");
+    } else {
+      if (playerOrbsTaken >= 1) {
+        setPlayerOrbsTaken(0);
+        setTurn("c");
+      } else {
+        alert("You must take at least one orb in your turn!");
+      }
+    }
   };
 
   return (
@@ -138,7 +211,12 @@ const Game = (props) => {
       ))}
       <br />
       Active Orbs: {countActiveOrbs()}
-      <button onClick={computerPlay}>End Turn</button>
+      <br />
+      Player Orbs Taken: {playerOrbsTaken}
+      <br />
+      <Button variant="outline-light" onClick={runGame}>
+        {turn === "p" ? "End Turn" : "Run"}
+      </Button>
     </div>
   );
 };

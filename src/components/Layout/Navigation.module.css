@@ -1,0 +1,13 @@
+.header {
+  width: 100%;
+  overflow: "hidden";
+  min-width: 0;
+  /* needed for Firefox */
+}
+
+.header button {
+  /* font-weight: bold; */
+  margin: 0.2rem 0.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
