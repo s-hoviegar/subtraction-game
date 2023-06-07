@@ -65,7 +65,7 @@ const Game = () => {
   }, [orbs]);
 
   const isEnd = useCallback(() => {
-    console.log(turn, countActiveOrbs());
+    // console.log(turn, countActiveOrbs());
     if (turn === "p" && countActiveOrbs() === 0) {
       alert("You Lost!");
       navigate("/", { replace: true });
