@@ -212,7 +212,7 @@ const Game = () => {
       <br />
       Active Orbs: {countActiveOrbs()}
       <br />
-      Player Orbs Taken: {playerOrbsTaken}
+      Player Orbs Taken: {playerOrbsTaken}/{orbsMoveNumber}
       <br />
       <Button variant="outline-light" onClick={runGame}>
         {turn === "p" ? "End Turn" : "Run Computer"}
