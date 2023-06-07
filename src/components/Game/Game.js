@@ -22,7 +22,14 @@ const Game = () => {
     firstTurn = state.turn;
   }
 
-  const [orbs, setOrbs] = useState([]);
+  const [orbs, setOrbs] = useState([
+    { id: 0, display: true },
+    { id: 1, display: true },
+    { id: 2, display: true },
+    { id: 3, display: true },
+    { id: 4, display: true },
+    { id: 5, display: true },
+  ]);
   const [turn, setTurn] = useState(firstTurn);
   const [playerOrbsTaken, setPlayerOrbsTaken] = useState(0);
 
@@ -42,13 +49,6 @@ const Game = () => {
     }
   });
 
-  useEffect(() => {
-    if (playerOrbsTaken === orbsMoveNumber) {
-      setPlayerOrbsTaken(0);
-      setTurn("c");
-    }
-  }, [playerOrbsTaken, orbsMoveNumber]);
-
   const countActiveOrbs = useCallback(() => {
     let count = 0;
     orbs.map((orb) => (orb.display ? count++ : null));
@@ -63,6 +63,25 @@ const Game = () => {
     });
     return activeOrbs;
   }, [orbs]);
+
+  const isEnd = useCallback(() => {
+    console.log(turn, countActiveOrbs());
+    if (turn === "p" && countActiveOrbs() === 0) {
+      alert("You Lost!");
+      navigate("/", { replace: true });
+    } else if (turn === "c" && countActiveOrbs() === 0) {
+      alert("You Won!");
+      navigate("/", { replace: true });
+    }
+  }, [countActiveOrbs, navigate, turn]);
+
+  useEffect(() => {
+    isEnd();
+    if (playerOrbsTaken === orbsMoveNumber) {
+      setPlayerOrbsTaken(0);
+      setTurn("c");
+    }
+  }, [playerOrbsTaken, orbsMoveNumber, isEnd]);
 
   const computerPlay = useCallback(() => {
     const remainingBalls = parseInt(countActiveOrbs());
@@ -116,19 +135,6 @@ const Game = () => {
     //alert(currentBalls[0].mouseout);
   }, [countActiveOrbs, orbsMoveNumber, returnAllOrbs]);
 
-  useEffect(() => {
-    if (turn === "c" && orbs.length > 0) {
-      computerPlay();
-      setTurn("p");
-    } else if (turn === "p" && countActiveOrbs() === 1) {
-      alert("You lost!");
-      navigate("/", { replace: true });
-    } else if (turn === "c" && countActiveOrbs() === 1) {
-      alert("You Won!");
-      navigate("/", { replace: true });
-    }
-  }, [turn, computerPlay, countActiveOrbs, navigate, orbs]);
-
   if (!state) {
     return null;
   }
@@ -179,13 +185,6 @@ const Game = () => {
   };
 
   const runGame = () => {
-    if (turn === "c" && countActiveOrbs() === 1) {
-      alert("You lost!");
-      navigate("/", { replace: true });
-    } else if (turn === "p" && countActiveOrbs() === 1) {
-      alert("You Won!");
-      navigate("/", { replace: true });
-    }
     if (turn === "c") {
       computerPlay();
       setTurn("p");
@@ -197,6 +196,7 @@ const Game = () => {
         alert("You must take at least one orb in your turn!");
       }
     }
+    isEnd();
   };
 
   return (
@@ -215,7 +215,7 @@ const Game = () => {
       Player Orbs Taken: {playerOrbsTaken}
       <br />
       <Button variant="outline-light" onClick={runGame}>
-        {turn === "p" ? "End Turn" : "Run"}
+        {turn === "p" ? "End Turn" : "Run Computer"}
       </Button>
     </div>
   );
