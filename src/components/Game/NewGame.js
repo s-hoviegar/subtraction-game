@@ -33,7 +33,12 @@ const NewGame = (props) => {
     event.preventDefault();
     // console.log("submit - orbs: ", numberOfOrbs, "turn: ", turn);
 
-    if (numberOfOrbs < 15 || numberOfMoves < 3) {
+    if (
+      numberOfOrbs < 15 ||
+      numberOfMoves < 3 ||
+      numberOfOrbs > 30 ||
+      numberOfMoves > 6
+    ) {
       setValidated(false);
     } else {
       setValidated(true);
@@ -61,7 +66,10 @@ const NewGame = (props) => {
               <InputGroup.Text id="orbs">Orbs:</InputGroup.Text>
               <Form.Control
                 required
-                isInvalid={!(parseInt(numberOfOrbs) >= 15)}
+                isInvalid={
+                  !(parseInt(numberOfOrbs) >= 15) ||
+                  !(parseInt(numberOfOrbs) <= 30)
+                }
                 placeholder="Number of orbs"
                 aria-label="Number of orbs"
                 aria-describedby="Enter the number of orbs to start playing"
@@ -70,14 +78,18 @@ const NewGame = (props) => {
                 onChange={orbsChangeHandler}
               />
               <Form.Control.Feedback type="invalid">
-                Must be greater than or equal to 15!
+                Must be greater than or equal to 15 and less than or equal to
+                30.
               </Form.Control.Feedback>
             </InputGroup>
             <InputGroup className="mb-3">
               <InputGroup.Text id="orbs">Moves:</InputGroup.Text>
               <Form.Control
                 required
-                isInvalid={!(parseInt(numberOfMoves) >= 3)}
+                isInvalid={
+                  !(parseInt(numberOfMoves) >= 3) ||
+                  !(parseInt(numberOfMoves) <= 6)
+                }
                 placeholder="Number of moves"
                 aria-label="Number of moves"
                 aria-describedby="Enter the number of moves any player has in their turn"
@@ -86,7 +98,7 @@ const NewGame = (props) => {
                 onChange={movesChangeHandler}
               />
               <Form.Control.Feedback type="invalid">
-                Must be greater than or equal to 3!
+                Must be greater than or equal to 3 and less than or equal to 6.
               </Form.Control.Feedback>
             </InputGroup>
           </Form.Group>
