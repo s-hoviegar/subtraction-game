@@ -17,7 +17,7 @@ const About = () => {
           at least one object and at max the number defined in "New Game" page
           with "Moves" field. The player who takes the last orb, loses the game.
           So be carefull choosing the objects and make your opponent take the
-          last one! Be aware that you cannot win the computer if the first turn
+          last one! Be aware that you cannot beat the computer if the first turn
           is set to "Computer".
         </p>
         <h3>Creator</h3>
