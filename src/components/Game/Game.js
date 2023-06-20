@@ -202,6 +202,7 @@ const Game = () => {
 
   return (
     <div className="board">
+      <h3>It's {turn === "p" ? "your" : "computer's"} turn!</h3>
       <TransitionGroup>
         {orbs.map((orb) => (
           <Orb
@@ -215,10 +216,13 @@ const Game = () => {
       <br />
       Active Orbs: {countActiveOrbs()}
       <br />
-      Player Orbs Taken: {playerOrbsTaken}/{orbsMoveNumber}
+      {turn === "p"
+        ? `Player Orbs Taken: ${playerOrbsTaken} / ${orbsMoveNumber}`
+        : ""}
+      <br />
       <br />
       <Button variant="outline-light" onClick={runGame}>
-        {turn === "p" ? "End Turn" : "Run Computer"}
+        {turn === "p" ? "End Your Turn" : "Run Computer Turn"}
       </Button>
     </div>
   );
