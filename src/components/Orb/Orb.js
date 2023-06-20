@@ -1,25 +1,24 @@
+import { CSSTransition } from "react-transition-group";
+
 import "./Orb.css";
 
 const Orb = (props) => {
-  //   console.log(props.children);
+  // console.log(props.display);
+  const cssClasses = ["ball", props.display ? "" : "ball-hidden"];
 
   const handleClick = (event) => {
-    props.onClickHandler(event);
+    if (props.display === true) {
+      props.onClickHandler(event);
+    }
   };
 
-  if (props.display) {
-    return (
-      <div className="ball" id={props.id} onClick={handleClick}>
+  return (
+    <CSSTransition key={props.display} timeout={500} classNames="fade">
+      <div className={cssClasses.join(" ")} id={props.id} onClick={handleClick}>
         {props.children}
       </div>
-    );
-  } else {
-    return (
-      <div className="hidden_ball" id={props.id}>
-        {props.children}
-      </div>
-    );
-  }
+    </CSSTransition>
+  );
 };
 
 export default Orb;

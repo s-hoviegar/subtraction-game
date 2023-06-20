@@ -5,6 +5,7 @@ import { Button } from "react-bootstrap";
 
 import Orb from "../Orb/Orb";
 import "./Game.css";
+import { TransitionGroup } from "react-transition-group";
 
 const Game = () => {
   const { state } = useLocation();
@@ -201,14 +202,16 @@ const Game = () => {
 
   return (
     <div className="board">
-      {orbs.map((orb) => (
-        <Orb
-          key={orb.id}
-          id={orb.id}
-          display={orb.display}
-          onClickHandler={turnOffOrb}
-        ></Orb>
-      ))}
+      <TransitionGroup>
+        {orbs.map((orb) => (
+          <Orb
+            key={orb.id}
+            id={orb.id}
+            display={orb.display}
+            onClickHandler={turnOffOrb}
+          ></Orb>
+        ))}
+      </TransitionGroup>
       <br />
       Active Orbs: {countActiveOrbs()}
       <br />
