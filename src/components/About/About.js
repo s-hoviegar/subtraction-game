@@ -23,7 +23,9 @@ const About = () => {
         <h3>Creator</h3>
         <p>Sajjad Hoviegar</p>
         <h3>Github</h3>
-        <a href="https://github.com/sh2p/subtraction-game">Subtraction Game</a>
+        <a href="https://github.com/s-hoviegar/subtraction-game">
+          Subtraction Game
+        </a>
       </Col>
       <Col></Col>
     </Row>
